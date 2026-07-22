@@ -1,4 +1,4 @@
-const CACHE_NAME = "nsl-finance-mobile-v8";
+const CACHE_NAME = "nsl-finance-mobile-v9";
 const APP_ROOT = "/nsl-finance-center/";
 const APP_SHELL = [APP_ROOT, `${APP_ROOT}index.html`];
 
@@ -59,3 +59,4 @@ self.addEventListener("fetch", event => {
     }),
   );
 });
+
