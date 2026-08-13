@@ -1,4 +1,4 @@
-const CACHE_NAME = "nsl-finance-mobile-v14";
+const CACHE_NAME = "nsl-finance-mobile-v15";
 const APP_ROOT = "/nsl-finance-center/";
 const APP_SHELL = [APP_ROOT, `${APP_ROOT}index.html`];
 
@@ -32,8 +32,10 @@ self.addEventListener("fetch", event => {
   if (url.origin !== self.location.origin || !url.pathname.startsWith(APP_ROOT)) return;
 
   if (request.mode === "navigate") {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
     event.respondWith(
-      fetch(request, { cache: "no-store" })
+      fetch(request, { cache: "no-store", signal: controller.signal })
         .then(response => {
           if (response.ok) {
             const copy = response.clone();
@@ -41,6 +43,7 @@ self.addEventListener("fetch", event => {
           }
           return response;
         })
+        .finally(() => clearTimeout(timeout))
         .catch(() => caches.match(`${APP_ROOT}index.html`).then(cached => cached || caches.match(APP_ROOT))),
     );
     return;
