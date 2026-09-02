@@ -33,7 +33,7 @@
 .manager-refunds-panel{margin-bottom:16px}.manager-refunds-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}.manager-refunds-head h2{margin:3px 0 0;color:var(--forest);font-family:Georgia,serif;font-size:24px;font-weight:500}.manager-refunds-head p{margin:5px 0 0;color:var(--muted);font-size:13px}.manager-refunds-badge{white-space:nowrap;border:1px solid #c9d9cf;background:#edf5f0;color:var(--forest);border-radius:99px;padding:7px 10px;font-size:13px;font-weight:800}.manager-refunds-form{display:grid;grid-template-columns:140px 150px minmax(210px,1fr) 170px minmax(190px,1fr) auto;gap:9px;align-items:end}.manager-refunds-field{display:flex;flex-direction:column;gap:5px}.manager-refunds-field span{color:var(--muted);font-size:12px;font-weight:750}.manager-refunds-field input,.manager-refunds-field select{width:100%;min-height:39px;border:1px solid var(--line);background:#fffdf9;color:var(--ink);border-radius:7px;padding:8px 9px;font:inherit;font-size:14px}.manager-refunds-field input:focus,.manager-refunds-field select:focus{outline:2px solid #c9d9cf;border-color:var(--forest)}.manager-refunds-save{min-height:39px}.manager-refunds-preview{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f3eee6;border:1px solid var(--line);border-radius:8px;margin:12px 0;padding:10px 12px}.manager-refunds-preview span{color:var(--muted);font-size:13px}.manager-refunds-preview strong{color:var(--forest);font-size:15px}.manager-refunds-message{min-height:18px;margin:0 0 8px;color:var(--muted);font-size:13px}.manager-refunds-message.error{color:#a6453b}.manager-refunds-message.success{color:#28715c;font-weight:750}.manager-refunds-list{display:flex;flex-direction:column;gap:7px}.manager-refunds-row{display:grid;grid-template-columns:minmax(180px,1.3fr) 110px 130px 150px minmax(160px,1fr) 78px;gap:10px;align-items:center;border-top:1px solid var(--line);padding:9px 2px;font-size:13px}.manager-refunds-row:first-child{border-top:0}.manager-refunds-row b{color:var(--forest)}.manager-refunds-row small{color:var(--muted)}.manager-refunds-delete{border:1px solid #dfc9c3;background:#fff7f4;color:#a6453b;border-radius:6px;cursor:pointer;padding:6px 8px;font-weight:750}.manager-refunds-empty{border:1px dashed var(--line);border-radius:8px;color:var(--muted);padding:13px;text-align:center;font-size:13px}.manager-refunds-total{display:flex;justify-content:flex-end;gap:18px;border-top:1px solid var(--line);margin-top:9px;padding-top:11px;color:var(--muted);font-size:13px}.manager-refunds-total b{color:var(--forest)}
 @media(max-width:1100px){.manager-refunds-form{grid-template-columns:repeat(2,minmax(0,1fr))}.manager-refunds-save{width:100%}.manager-refunds-row{grid-template-columns:1fr 1fr 1fr}.manager-refunds-row .refund-note{grid-column:1/3}}
 @media(max-width:640px){.manager-refunds-head{flex-direction:column}.manager-refunds-form{grid-template-columns:1fr}.manager-refunds-row{grid-template-columns:1fr 1fr}.manager-refunds-row .refund-manager,.manager-refunds-row .refund-note{grid-column:1/-1}.manager-refunds-total{flex-direction:column;gap:4px}.manager-refunds-badge{white-space:normal}}
-</style>
+.adjustment-tabs{display:flex;gap:7px;margin:0 0 14px;padding:4px;background:#f3eee6;border:1px solid var(--line);border-radius:9px;width:fit-content}.adjustment-tabs button{border:0;background:transparent;color:var(--muted);border-radius:7px;cursor:pointer;padding:8px 12px;font-size:13px;font-weight:800}.adjustment-tabs button.active{background:#fff;color:var(--forest);box-shadow:0 1px 4px #183d3218}.adjustment-view[hidden]{display:none!important}.employee-deduction-note{color:var(--muted);font-size:13px;margin:-3px 0 12px}.employee-deduction-tag{display:inline-flex;border:1px solid #dfc9c3;background:#fff7f4;color:#8f4d43;border-radius:99px;padding:4px 8px;font-size:12px;font-weight:800}</style>
 <script id="manager-refunds-runtime">
 (function(){
   "use strict";
@@ -120,19 +120,47 @@
     section.id=panelId;
     section.className="panel full-panel manager-refunds-panel";
     section.innerHTML=
-      '<div class="manager-refunds-head"><div><span class="eyebrow">Корректировка ФОТ</span><h2>Возвраты менеджеров</h2><p>Возврат уменьшает KPI выбранного менеджера на 9,5% и автоматически попадает в P&amp;L.</p></div><span class="manager-refunds-badge">Удержание 9,5%</span></div>'+
-      '<div class="manager-refunds-form">'+
-        '<label class="manager-refunds-field"><span>Месяц</span><input id="manager-refund-month" type="month"></label>'+
-        '<label class="manager-refunds-field"><span>Дата возврата</span><input id="manager-refund-date" type="date"></label>'+
-        '<label class="manager-refunds-field"><span>Менеджер</span><select id="manager-refund-manager"><option value="">Загрузка…</option></select></label>'+
-        '<label class="manager-refunds-field"><span>Сумма возврата</span><input id="manager-refund-amount" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="0"></label>'+
-        '<label class="manager-refunds-field"><span>Комментарий</span><input id="manager-refund-note" type="text" placeholder="Причина или заказ"></label>'+
-        '<button id="manager-refund-save" class="primary-button manager-refunds-save" type="button">Добавить возврат</button>'+
+      '<div class="manager-refunds-head"><div><span class="eyebrow">Корректировка ФОТ</span><h2>Удержания и возвраты</h2><p>Два независимых регистра: возвраты клиентов менеджеров и внутренние удержания сотрудников.</p></div><span class="manager-refunds-badge">Автоматический перерасчёт</span></div>'+
+      '<div class="adjustment-tabs"><button type="button" class="active" data-adjustment-tab="refunds">Возвраты менеджеров</button><button type="button" data-adjustment-tab="deductions">Удержания сотрудников</button></div>'+
+      '<div class="adjustment-view" data-adjustment-view="refunds">'+
+        '<p class="employee-deduction-note">Возврат попадает в P&amp;L и уменьшает KPI выбранного менеджера на 9,5%.</p>'+
+        '<div class="manager-refunds-form">'+
+          '<label class="manager-refunds-field"><span>Месяц</span><input id="manager-refund-month" type="month"></label>'+
+          '<label class="manager-refunds-field"><span>Дата возврата</span><input id="manager-refund-date" type="date"></label>'+
+          '<label class="manager-refunds-field"><span>Менеджер</span><select id="manager-refund-manager"><option value="">Загрузка…</option></select></label>'+
+          '<label class="manager-refunds-field"><span>Сумма возврата</span><input id="manager-refund-amount" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="0"></label>'+
+          '<label class="manager-refunds-field"><span>Комментарий</span><input id="manager-refund-note" type="text" placeholder="Причина или заказ"></label>'+
+          '<button id="manager-refund-save" class="primary-button manager-refunds-save" type="button">Добавить возврат</button>'+
+        '</div>'+
+        '<div class="manager-refunds-preview"><span>Удержание из KPI менеджера · 9,5%</span><strong id="manager-refund-preview">0 ₽</strong></div>'+
+        '<p id="manager-refunds-message" class="manager-refunds-message"></p>'+
+        '<div id="manager-refunds-list" class="manager-refunds-list"><div class="manager-refunds-empty">Загрузка возвратов…</div></div>'+
       '</div>'+
-      '<div class="manager-refunds-preview"><span>Удержание из KPI менеджера</span><strong id="manager-refund-preview">0 ₽</strong></div>'+
-      '<p id="manager-refunds-message" class="manager-refunds-message"></p>'+
-      '<div id="manager-refunds-list" class="manager-refunds-list"><div class="manager-refunds-empty">Загрузка возвратов…</div></div>';
+      '<div class="adjustment-view" data-adjustment-view="deductions" hidden>'+
+        '<p class="employee-deduction-note">Удержание доступно для любого сотрудника. Сначала уменьшается KPI, затем оклад; общий ФОТ и расходы P&amp;L пересчитываются автоматически.</p>'+
+        '<div class="manager-refunds-form">'+
+          '<label class="manager-refunds-field"><span>Месяц</span><input id="employee-deduction-month" type="month"></label>'+
+          '<label class="manager-refunds-field"><span>Дата удержания</span><input id="employee-deduction-date" type="date"></label>'+
+          '<label class="manager-refunds-field"><span>Сотрудник</span><select id="employee-deduction-employee"><option value="">Загрузка…</option></select></label>'+
+          '<label class="manager-refunds-field"><span>Сумма удержания</span><input id="employee-deduction-amount" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="0"></label>'+
+          '<label class="manager-refunds-field"><span>Комментарий</span><input id="employee-deduction-note" type="text" placeholder="Причина удержания"></label>'+
+          '<button id="employee-deduction-save" class="primary-button manager-refunds-save" type="button">Добавить удержание</button>'+
+        '</div>'+
+        '<div class="manager-refunds-preview"><span>Уменьшение ФОТ сотрудника</span><strong id="employee-deduction-preview">0 ₽</strong></div>'+
+        '<p id="employee-deductions-message" class="manager-refunds-message"></p>'+
+        '<div id="employee-deductions-list" class="manager-refunds-list"><div class="manager-refunds-empty">Загрузка удержаний…</div></div>'+
+      '</div>';
     host.parentNode.insertBefore(section,host);
+
+    Array.prototype.forEach.call(section.querySelectorAll("[data-adjustment-tab]"),function(tab){
+      tab.addEventListener("click",function(){
+        var key=tab.getAttribute("data-adjustment-tab");
+        Array.prototype.forEach.call(section.querySelectorAll("[data-adjustment-tab]"),function(item){item.classList.toggle("active",item===tab);});
+        Array.prototype.forEach.call(section.querySelectorAll("[data-adjustment-view]"),function(view){view.hidden=view.getAttribute("data-adjustment-view")!==key;});
+        if(key==="deductions")loadEmployeeDeductions();
+      });
+    });
+
     var month=document.getElementById("manager-refund-month");
     month.value=currentMonth();
     document.getElementById("manager-refund-date").value=lastDay(month.value);
@@ -142,6 +170,16 @@
     });
     document.getElementById("manager-refund-amount").addEventListener("input",updatePreview);
     document.getElementById("manager-refund-save").addEventListener("click",saveRefund);
+
+    var deductionMonth=document.getElementById("employee-deduction-month");
+    deductionMonth.value=currentMonth();
+    document.getElementById("employee-deduction-date").value=lastDay(deductionMonth.value);
+    deductionMonth.addEventListener("change",function(){
+      document.getElementById("employee-deduction-date").value=lastDay(deductionMonth.value);
+      loadEmployeeDeductions();
+    });
+    document.getElementById("employee-deduction-amount").addEventListener("input",updateEmployeeDeductionPreview);
+    document.getElementById("employee-deduction-save").addEventListener("click",saveEmployeeDeduction);
     loadPanel();
   }
   function updatePreview(){
@@ -246,6 +284,113 @@
       await loadPanel();
       window.setTimeout(function(){window.location.reload();},900);
     }catch(error){busy=false;setMessage(error.message||String(error),"error");}
+  }
+  function setEmployeeDeductionMessage(text,type){
+    var el=document.getElementById("employee-deductions-message");
+    if(!el)return;
+    el.textContent=text||"";
+    el.className="manager-refunds-message "+(type||"");
+  }
+  function updateEmployeeDeductionPreview(){
+    var amount=Number((document.getElementById("employee-deduction-amount")||{}).value||0);
+    var preview=document.getElementById("employee-deduction-preview");
+    if(preview)preview.textContent=money(amount);
+  }
+  async function loadEmployeeDeductions(){
+    if(busy)return;
+    var monthEl=document.getElementById("employee-deduction-month");
+    if(!monthEl)return;
+    busy=true;
+    setEmployeeDeductionMessage("");
+    try{
+      var month=monthEl.value||currentMonth();
+      var payrollParams=new URLSearchParams({
+        select:"id,employee,department,salary,kpi,gross_salary,gross_kpi,refund_deduction,employee_deduction,sort_order",
+        month:"eq."+month,
+        order:"department.asc,sort_order.asc,id.asc"
+      });
+      var deductionParams=new URLSearchParams({
+        select:"id,month,payroll_id,employee_name,deduction_date,amount,note,created_at",
+        month:"eq."+month,
+        order:"deduction_date.desc,id.desc"
+      });
+      var results=await Promise.all([
+        api("finance_payroll?"+payrollParams.toString()),
+        api("finance_employee_deductions?"+deductionParams.toString())
+      ]);
+      renderDeductionEmployees(results[0]||[]);
+      renderEmployeeDeductions(results[1]||[]);
+    }catch(error){
+      setEmployeeDeductionMessage(error.message||String(error),"error");
+      var list=document.getElementById("employee-deductions-list");
+      if(list)list.innerHTML='<div class="manager-refunds-empty">Не удалось загрузить данные</div>';
+    }finally{busy=false;}
+  }
+  function renderDeductionEmployees(rows){
+    var select=document.getElementById("employee-deduction-employee");
+    if(!select)return;
+    select.innerHTML='<option value="">Выберите сотрудника</option>'+rows.map(function(row){
+      var detail=row.employee_deduction>0?" · удержано "+money(row.employee_deduction):"";
+      return '<option value="'+escapeHtml(row.id)+'">'+escapeHtml(row.employee+" · "+row.department+detail)+'</option>';
+    }).join("");
+  }
+  function renderEmployeeDeductions(rows){
+    var list=document.getElementById("employee-deductions-list");
+    if(!list)return;
+    if(!rows.length){list.innerHTML='<div class="manager-refunds-empty">В выбранном месяце удержаний нет</div>';return;}
+    var total=rows.reduce(function(sum,row){return sum+Number(row.amount||0);},0);
+    list.innerHTML=rows.map(function(row){
+      return '<div class="manager-refunds-row">'+
+        '<span class="refund-manager"><b>'+escapeHtml(row.employee_name)+'</b><br><small>'+escapeHtml(row.deduction_date)+'</small></span>'+
+        '<span><b>−'+money(row.amount)+'</b></span>'+
+        '<span><span class="employee-deduction-tag">Удержание</span></span>'+
+        '<span><small>Из ФОТ</small><br><b>−'+money(row.amount)+'</b></span>'+
+        '<span class="refund-note">'+escapeHtml(row.note||"Без комментария")+'</span>'+
+        '<button class="manager-refunds-delete" type="button" data-deduction-id="'+escapeHtml(row.id)+'">Удалить</button>'+
+      '</div>';
+    }).join("")+
+      '<div class="manager-refunds-total"><span>Всего удержано из ФОТ: <b>'+money(total)+'</b></span></div>';
+    Array.prototype.forEach.call(list.querySelectorAll("[data-deduction-id]"),function(button){
+      button.addEventListener("click",function(){deleteEmployeeDeduction(button.getAttribute("data-deduction-id"));});
+    });
+  }
+  async function saveEmployeeDeduction(){
+    if(busy)return;
+    var employee=document.getElementById("employee-deduction-employee").value;
+    var amount=Number(document.getElementById("employee-deduction-amount").value||0);
+    var date=document.getElementById("employee-deduction-date").value;
+    var note=document.getElementById("employee-deduction-note").value.trim();
+    if(!employee){setEmployeeDeductionMessage("Выберите сотрудника","error");return;}
+    if(!(amount>0)){setEmployeeDeductionMessage("Введите сумму удержания","error");return;}
+    if(!date){setEmployeeDeductionMessage("Укажите дату удержания","error");return;}
+    busy=true;
+    setEmployeeDeductionMessage("Сохраняю удержание…");
+    try{
+      await api("finance_employee_deductions",{
+        method:"POST",
+        headers:{"Prefer":"return=representation"},
+        body:JSON.stringify({payroll_id:Number(employee),deduction_date:date,amount:amount,note:note})
+      });
+      document.getElementById("employee-deduction-amount").value="";
+      document.getElementById("employee-deduction-note").value="";
+      updateEmployeeDeductionPreview();
+      setEmployeeDeductionMessage("Удержание добавлено. ФОТ и расходы пересчитаны.","success");
+      busy=false;
+      await loadEmployeeDeductions();
+      window.setTimeout(function(){window.location.reload();},900);
+    }catch(error){busy=false;setEmployeeDeductionMessage(error.message||String(error),"error");}
+  }
+  async function deleteEmployeeDeduction(id){
+    if(busy||!window.confirm("Удалить удержание? ФОТ и расходы будут пересчитаны обратно."))return;
+    busy=true;
+    setEmployeeDeductionMessage("Удаляю удержание…");
+    try{
+      await api("finance_employee_deductions?id=eq."+encodeURIComponent(id),{method:"DELETE"});
+      setEmployeeDeductionMessage("Удержание удалено. Расчёты обновлены.","success");
+      busy=false;
+      await loadEmployeeDeductions();
+      window.setTimeout(function(){window.location.reload();},900);
+    }catch(error){busy=false;setEmployeeDeductionMessage(error.message||String(error),"error");}
   }
   function scheduleMount(){
     if(observerTimer)return;
