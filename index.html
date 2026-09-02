@@ -28,4 +28,231 @@
 .gc-client-mix-table td:nth-child(4):before{content:"Деньги в кассу"}
 .gc-client-mix-table td:nth-child(5):before{content:"Доля по выручке"}
 }
-</style></head><body><div id="root"></div></body></html>
+</style></head><body><div id="root"></div>
+<style id="manager-refunds-style">
+.manager-refunds-panel{margin-bottom:16px}.manager-refunds-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}.manager-refunds-head h2{margin:3px 0 0;color:var(--forest);font-family:Georgia,serif;font-size:24px;font-weight:500}.manager-refunds-head p{margin:5px 0 0;color:var(--muted);font-size:13px}.manager-refunds-badge{white-space:nowrap;border:1px solid #c9d9cf;background:#edf5f0;color:var(--forest);border-radius:99px;padding:7px 10px;font-size:13px;font-weight:800}.manager-refunds-form{display:grid;grid-template-columns:140px 150px minmax(210px,1fr) 170px minmax(190px,1fr) auto;gap:9px;align-items:end}.manager-refunds-field{display:flex;flex-direction:column;gap:5px}.manager-refunds-field span{color:var(--muted);font-size:12px;font-weight:750}.manager-refunds-field input,.manager-refunds-field select{width:100%;min-height:39px;border:1px solid var(--line);background:#fffdf9;color:var(--ink);border-radius:7px;padding:8px 9px;font:inherit;font-size:14px}.manager-refunds-field input:focus,.manager-refunds-field select:focus{outline:2px solid #c9d9cf;border-color:var(--forest)}.manager-refunds-save{min-height:39px}.manager-refunds-preview{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f3eee6;border:1px solid var(--line);border-radius:8px;margin:12px 0;padding:10px 12px}.manager-refunds-preview span{color:var(--muted);font-size:13px}.manager-refunds-preview strong{color:var(--forest);font-size:15px}.manager-refunds-message{min-height:18px;margin:0 0 8px;color:var(--muted);font-size:13px}.manager-refunds-message.error{color:#a6453b}.manager-refunds-message.success{color:#28715c;font-weight:750}.manager-refunds-list{display:flex;flex-direction:column;gap:7px}.manager-refunds-row{display:grid;grid-template-columns:minmax(180px,1.3fr) 110px 130px 150px minmax(160px,1fr) 78px;gap:10px;align-items:center;border-top:1px solid var(--line);padding:9px 2px;font-size:13px}.manager-refunds-row:first-child{border-top:0}.manager-refunds-row b{color:var(--forest)}.manager-refunds-row small{color:var(--muted)}.manager-refunds-delete{border:1px solid #dfc9c3;background:#fff7f4;color:#a6453b;border-radius:6px;cursor:pointer;padding:6px 8px;font-weight:750}.manager-refunds-empty{border:1px dashed var(--line);border-radius:8px;color:var(--muted);padding:13px;text-align:center;font-size:13px}.manager-refunds-total{display:flex;justify-content:flex-end;gap:18px;border-top:1px solid var(--line);margin-top:9px;padding-top:11px;color:var(--muted);font-size:13px}.manager-refunds-total b{color:var(--forest)}
+@media(max-width:1100px){.manager-refunds-form{grid-template-columns:repeat(2,minmax(0,1fr))}.manager-refunds-save{width:100%}.manager-refunds-row{grid-template-columns:1fr 1fr 1fr}.manager-refunds-row .refund-note{grid-column:1/3}}
+@media(max-width:640px){.manager-refunds-head{flex-direction:column}.manager-refunds-form{grid-template-columns:1fr}.manager-refunds-row{grid-template-columns:1fr 1fr}.manager-refunds-row .refund-manager,.manager-refunds-row .refund-note{grid-column:1/-1}.manager-refunds-total{flex-direction:column;gap:4px}.manager-refunds-badge{white-space:normal}}
+</style>
+<script id="manager-refunds-runtime">
+(function(){
+  "use strict";
+  var API_URL="https://wmnymdmjiczbmjyztcze.supabase.co";
+  var API_KEY="sb_publishable_Uqq-PpfJkZVkPYbd6CsYlQ_zKlTJPG4";
+  var panelId="manager-refunds-panel";
+  var busy=false;
+  var observerTimer=0;
+
+  function escapeHtml(value){
+    return String(value==null?"":value).replace(/[&<>"']/g,function(ch){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch];});
+  }
+  function findToken(value,depth){
+    if(depth>4||value==null)return "";
+    if(typeof value==="string"){
+      if(value.split(".").length===3&&value.length>80)return value;
+      try{return findToken(JSON.parse(value),depth+1);}catch(_){return "";}
+    }
+    if(typeof value==="object"){
+      if(typeof value.access_token==="string")return value.access_token;
+      var keys=Object.keys(value);
+      for(var i=0;i<keys.length;i++){var token=findToken(value[keys[i]],depth+1);if(token)return token;}
+    }
+    return "";
+  }
+  function accessToken(){
+    var preferred=localStorage.getItem("nsl-finance-session");
+    var token=findToken(preferred,0);
+    if(token)return token;
+    for(var i=0;i<localStorage.length;i++){
+      var key=localStorage.key(i)||"";
+      if(key.indexOf("auth-token")>=0||key.indexOf("finance")>=0){
+        token=findToken(localStorage.getItem(key),0);
+        if(token)return token;
+      }
+    }
+    return "";
+  }
+  async function api(path,options){
+    var token=accessToken();
+    if(!token)throw new Error("Войдите в кабинет администратора");
+    var init=options||{};
+    init.headers=Object.assign({
+      "apikey":API_KEY,
+      "Authorization":"Bearer "+token,
+      "Content-Type":"application/json",
+      "Accept":"application/json"
+    },init.headers||{});
+    var response=await fetch(API_URL+"/rest/v1/"+path,init);
+    if(!response.ok){
+      var body={};
+      try{body=await response.json();}catch(_){}
+      throw new Error(body.message||body.details||("Ошибка "+response.status));
+    }
+    if(response.status===204)return null;
+    var text=await response.text();
+    return text?JSON.parse(text):null;
+  }
+  function currentMonth(){
+    var parts=new Intl.DateTimeFormat("en",{timeZone:"Asia/Vladivostok",year:"numeric",month:"2-digit"}).formatToParts(new Date());
+    var y=parts.find(function(p){return p.type==="year";});
+    var m=parts.find(function(p){return p.type==="month";});
+    return (y?y.value:new Date().getFullYear())+"-"+(m?m.value:String(new Date().getMonth()+1).padStart(2,"0"));
+  }
+  function lastDay(month){
+    var bits=month.split("-").map(Number);
+    var day=new Date(Date.UTC(bits[0],bits[1],0)).getUTCDate();
+    return month+"-"+String(day).padStart(2,"0");
+  }
+  function money(value){
+    var n=Number(value||0);
+    return n.toLocaleString("ru-RU",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})+" ₽";
+  }
+  function setMessage(text,type){
+    var el=document.getElementById("manager-refunds-message");
+    if(!el)return;
+    el.textContent=text||"";
+    el.className="manager-refunds-message "+(type||"");
+  }
+  function renderShell(){
+    var host=document.querySelector(".payroll-panel");
+    if(!host||document.getElementById(panelId))return;
+    var section=document.createElement("section");
+    section.id=panelId;
+    section.className="panel full-panel manager-refunds-panel";
+    section.innerHTML=
+      '<div class="manager-refunds-head"><div><span class="eyebrow">Корректировка ФОТ</span><h2>Возвраты менеджеров</h2><p>Возврат уменьшает KPI выбранного менеджера на 9,5% и автоматически попадает в P&amp;L.</p></div><span class="manager-refunds-badge">Удержание 9,5%</span></div>'+
+      '<div class="manager-refunds-form">'+
+        '<label class="manager-refunds-field"><span>Месяц</span><input id="manager-refund-month" type="month"></label>'+
+        '<label class="manager-refunds-field"><span>Дата возврата</span><input id="manager-refund-date" type="date"></label>'+
+        '<label class="manager-refunds-field"><span>Менеджер</span><select id="manager-refund-manager"><option value="">Загрузка…</option></select></label>'+
+        '<label class="manager-refunds-field"><span>Сумма возврата</span><input id="manager-refund-amount" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="0"></label>'+
+        '<label class="manager-refunds-field"><span>Комментарий</span><input id="manager-refund-note" type="text" placeholder="Причина или заказ"></label>'+
+        '<button id="manager-refund-save" class="primary-button manager-refunds-save" type="button">Добавить возврат</button>'+
+      '</div>'+
+      '<div class="manager-refunds-preview"><span>Удержание из KPI менеджера</span><strong id="manager-refund-preview">0 ₽</strong></div>'+
+      '<p id="manager-refunds-message" class="manager-refunds-message"></p>'+
+      '<div id="manager-refunds-list" class="manager-refunds-list"><div class="manager-refunds-empty">Загрузка возвратов…</div></div>';
+    host.parentNode.insertBefore(section,host);
+    var month=document.getElementById("manager-refund-month");
+    month.value=currentMonth();
+    document.getElementById("manager-refund-date").value=lastDay(month.value);
+    month.addEventListener("change",function(){
+      document.getElementById("manager-refund-date").value=lastDay(month.value);
+      loadPanel();
+    });
+    document.getElementById("manager-refund-amount").addEventListener("input",updatePreview);
+    document.getElementById("manager-refund-save").addEventListener("click",saveRefund);
+    loadPanel();
+  }
+  function updatePreview(){
+    var amount=Number((document.getElementById("manager-refund-amount")||{}).value||0);
+    var preview=document.getElementById("manager-refund-preview");
+    if(preview)preview.textContent=money(Math.round(amount*9.5)/100);
+  }
+  async function loadPanel(){
+    if(busy)return;
+    var monthEl=document.getElementById("manager-refund-month");
+    if(!monthEl)return;
+    busy=true;
+    setMessage("");
+    try{
+      var month=monthEl.value||currentMonth();
+      var payrollParams=new URLSearchParams({
+        select:"id,employee,department,kpi,gross_kpi,refund_deduction,sort_order",
+        month:"eq."+month,
+        department:"eq.Отдел продаж",
+        order:"sort_order.asc,id.asc"
+      });
+      var refundParams=new URLSearchParams({
+        select:"id,month,manager_payroll_id,manager_name,refund_date,amount,commission_rate,deduction,note,created_at",
+        month:"eq."+month,
+        order:"refund_date.desc,id.desc"
+      });
+      var results=await Promise.all([
+        api("finance_payroll?"+payrollParams.toString()),
+        api("finance_manager_refunds?"+refundParams.toString())
+      ]);
+      renderManagers(results[0]||[]);
+      renderRefunds(results[1]||[]);
+    }catch(error){
+      setMessage(error.message||String(error),"error");
+      var list=document.getElementById("manager-refunds-list");
+      if(list)list.innerHTML='<div class="manager-refunds-empty">Не удалось загрузить данные</div>';
+    }finally{busy=false;}
+  }
+  function renderManagers(rows){
+    var select=document.getElementById("manager-refund-manager");
+    if(!select)return;
+    select.innerHTML='<option value="">Выберите менеджера</option>'+rows.map(function(row){
+      var detail=row.refund_deduction>0?" · удержано "+money(row.refund_deduction):"";
+      return '<option value="'+escapeHtml(row.id)+'">'+escapeHtml(row.employee+detail)+'</option>';
+    }).join("");
+  }
+  function renderRefunds(rows){
+    var list=document.getElementById("manager-refunds-list");
+    if(!list)return;
+    if(!rows.length){list.innerHTML='<div class="manager-refunds-empty">В выбранном месяце возвратов нет</div>';return;}
+    var totalAmount=rows.reduce(function(sum,row){return sum+Number(row.amount||0);},0);
+    var totalDeduction=rows.reduce(function(sum,row){return sum+Number(row.deduction||0);},0);
+    list.innerHTML=rows.map(function(row){
+      return '<div class="manager-refunds-row">'+
+        '<span class="refund-manager"><b>'+escapeHtml(row.manager_name)+'</b><br><small>'+escapeHtml(row.refund_date)+'</small></span>'+
+        '<span>'+money(row.amount)+'</span>'+
+        '<span><small>Ставка</small><br><b>'+escapeHtml(row.commission_rate)+'%</b></span>'+
+        '<span><small>Удержание</small><br><b>−'+money(row.deduction)+'</b></span>'+
+        '<span class="refund-note">'+escapeHtml(row.note||"Без комментария")+'</span>'+
+        '<button class="manager-refunds-delete" type="button" data-refund-id="'+escapeHtml(row.id)+'">Удалить</button>'+
+      '</div>';
+    }).join("")+
+      '<div class="manager-refunds-total"><span>Возвраты: <b>'+money(totalAmount)+'</b></span><span>Удержано из KPI: <b>'+money(totalDeduction)+'</b></span></div>';
+    Array.prototype.forEach.call(list.querySelectorAll("[data-refund-id]"),function(button){
+      button.addEventListener("click",function(){deleteRefund(button.getAttribute("data-refund-id"));});
+    });
+  }
+  async function saveRefund(){
+    if(busy)return;
+    var manager=document.getElementById("manager-refund-manager").value;
+    var amount=Number(document.getElementById("manager-refund-amount").value||0);
+    var date=document.getElementById("manager-refund-date").value;
+    var note=document.getElementById("manager-refund-note").value.trim();
+    if(!manager){setMessage("Выберите менеджера","error");return;}
+    if(!(amount>0)){setMessage("Введите сумму возврата","error");return;}
+    if(!date){setMessage("Укажите дату возврата","error");return;}
+    busy=true;
+    setMessage("Сохраняю возврат…");
+    try{
+      await api("finance_manager_refunds",{
+        method:"POST",
+        headers:{"Prefer":"return=representation"},
+        body:JSON.stringify({manager_payroll_id:Number(manager),refund_date:date,amount:amount,commission_rate:9.5,note:note})
+      });
+      document.getElementById("manager-refund-amount").value="";
+      document.getElementById("manager-refund-note").value="";
+      updatePreview();
+      setMessage("Возврат добавлен. ФОТ и P&L пересчитаны.","success");
+      busy=false;
+      await loadPanel();
+      window.setTimeout(function(){window.location.reload();},900);
+    }catch(error){busy=false;setMessage(error.message||String(error),"error");}
+  }
+  async function deleteRefund(id){
+    if(busy||!window.confirm("Удалить возврат? Зарплата менеджера и P&L будут пересчитаны обратно."))return;
+    busy=true;
+    setMessage("Удаляю возврат…");
+    try{
+      await api("finance_manager_refunds?id=eq."+encodeURIComponent(id),{method:"DELETE"});
+      setMessage("Возврат удалён. Расчёты обновлены.","success");
+      busy=false;
+      await loadPanel();
+      window.setTimeout(function(){window.location.reload();},900);
+    }catch(error){busy=false;setMessage(error.message||String(error),"error");}
+  }
+  function scheduleMount(){
+    if(observerTimer)return;
+    observerTimer=window.setTimeout(function(){observerTimer=0;renderShell();},120);
+  }
+  new MutationObserver(scheduleMount).observe(document.documentElement,{childList:true,subtree:true});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",scheduleMount);else scheduleMount();
+})();
+</script>
+</body></html>
