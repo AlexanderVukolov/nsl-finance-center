@@ -1,0 +1,42 @@
+name: Optimize Supabase egress
+
+on:
+  push:
+    paths:
+      - '.github/workflows/optimize-supabase-egress.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-finance-client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove duplicate influence-sync browser request
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          pattern = r'async function Fa\(e=!1\)\{.*?\}function Ia\(e\)\{'
+          replacement = '''async function Fa(e=!1){if(!e&&Aa&&Date.now()-Aa.at<5e3)return Aa.value;if(ja)return ja;ja=(async()=>{let[{data:e,error:t},{data:s,error:i}]=await Promise.all([V.functions.invoke("finance-sync",{body:{}}),V.functions.invoke("gc-client-mix",{body:{}})]);if(t)throw t;let a=e??{};return!i&&s&&(a={...a,gcClientMix:Array.isArray(s.gcClientMix)?s.gcClientMix:[],todayLeads:s.todayLeads??a.todayLeads??null,fresh:{...a.fresh??{},gcClientMix:!!s.fresh,todayLeads:!!s.fresh},sourceUrls:{...a.sourceUrls??{},gcClients:s.sourceUrl,schoolDaily:s.schoolSourceUrl}}),Aa={at:Date.now(),value:a},a})();try{return await ja}finally{ja=null}}function Ia(e){'''
+          updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+          if count != 1:
+              raise SystemExit(f'Expected one Fa() block, replaced {count}')
+          if 'V.functions.invoke("influence-sync",{body:{}})' in updated:
+              raise SystemExit('Duplicate influence-sync invoke still present')
+          path.write_text(updated, encoding='utf-8')
+      - name: Commit optimized bundle
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "No changes required"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Remove duplicate influence sync request"
+          git push
