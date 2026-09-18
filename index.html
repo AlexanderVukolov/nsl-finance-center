@@ -18,15 +18,32 @@
   .expense-share-head strong{font-size:24px}
 }
 </style><style id="gc-client-mix-layout">
-.gc-client-mix-table td,.gc-client-mix-table th{font-variant-numeric:tabular-nums}
+.gc-client-mix-panel{padding:14px 16px}
+.gc-client-mix-panel .section-title{gap:8px;margin-bottom:8px}
+.gc-client-mix-panel .section-title h2{font-size:20px;line-height:1.15}
+.gc-client-mix-panel .analytics-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.gc-client-mix-panel .gc-client-mix-table{min-width:620px;width:100%;table-layout:fixed}
+.gc-client-mix-table th,.gc-client-mix-table td{padding:7px 9px;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gc-client-mix-table th:first-child,.gc-client-mix-table td:first-child{width:25%;white-space:normal}
+.gc-client-mix-table th:nth-child(2),.gc-client-mix-table td:nth-child(2){width:18%}
+.gc-client-mix-table th:nth-child(3),.gc-client-mix-table td:nth-child(3){width:19%}
+.gc-client-mix-table th:nth-child(4),.gc-client-mix-table td:nth-child(4){width:20%}
+.gc-client-mix-table th:nth-child(5),.gc-client-mix-table td:nth-child(5){width:18%}
 .gc-client-mix-table tbody tr:first-child td{font-weight:800;background:#eef4f0}
-@media (max-width:620px){
+.gc-client-mix-panel .footnote{margin-top:8px;font-size:12px;line-height:1.35}
+@media(max-width:620px){
 .gc-client-mix-panel{padding:10px 8px}
-.gc-client-mix-table td:first-child:before{content:"Категория"}
-.gc-client-mix-table td:nth-child(2):before{content:"Количество продаж"}
-.gc-client-mix-table td:nth-child(3):before{content:"Выручка"}
-.gc-client-mix-table td:nth-child(4):before{content:"Деньги в кассу"}
-.gc-client-mix-table td:nth-child(5):before{content:"Доля по выручке"}
+.gc-client-mix-panel .section-title{align-items:flex-start;margin-bottom:7px}
+.gc-client-mix-panel .section-title h2{font-size:17px}
+.gc-client-mix-panel .analytics-table-wrap{overflow-x:auto;touch-action:pan-x pan-y}
+.gc-client-mix-panel .gc-client-mix-table{display:table;min-width:590px!important}
+.gc-client-mix-table thead{display:table-header-group}
+.gc-client-mix-table tbody{display:table-row-group}
+.gc-client-mix-table tr{display:table-row;padding:0;margin:0;border:0;border-radius:0;box-shadow:none;background:transparent}
+.gc-client-mix-table th,.gc-client-mix-table td{display:table-cell;padding:6px 7px;text-align:left!important;white-space:nowrap!important;border-top:1px solid #e9e2d8;font-size:11px;overflow-wrap:normal}
+.gc-client-mix-table td:first-child{width:25%;padding:6px 7px;border-bottom:0;grid-column:auto}
+.gc-client-mix-table td:before{content:none!important}
+.gc-client-mix-panel .footnote{font-size:11px}
 }
 </style><style id="pnl-full-labels-style">
 .pnl-detail-table th:first-child,.pnl-detail-table td:first-child{width:34%;min-width:420px;white-space:normal}
