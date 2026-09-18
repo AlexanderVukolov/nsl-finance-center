@@ -45,6 +45,17 @@
 @media(max-width:640px){.manager-refunds-head{flex-direction:column}.manager-refunds-form{grid-template-columns:1fr}.manager-refunds-row{grid-template-columns:1fr 1fr}.manager-refunds-row .refund-manager,.manager-refunds-row .refund-note{grid-column:1/-1}.manager-refunds-total{flex-direction:column;gap:4px}.manager-refunds-badge{white-space:normal}}
 .adjustment-tabs{display:flex;gap:7px;margin:0 0 14px;padding:4px;background:#f3eee6;border:1px solid var(--line);border-radius:9px;width:fit-content}.adjustment-tabs button{border:0;background:transparent;color:var(--muted);border-radius:7px;cursor:pointer;padding:8px 12px;font-size:13px;font-weight:800}.adjustment-tabs button.active{background:#fff;color:var(--forest);box-shadow:0 1px 4px #183d3218}.adjustment-view[hidden]{display:none!important}.employee-deduction-note{color:var(--muted);font-size:13px;margin:-3px 0 12px}.employee-deduction-tag{display:inline-flex;border:1px solid #dfc9c3;background:#fff7f4;color:#8f4d43;border-radius:99px;padding:4px 8px;font-size:12px;font-weight:800}</style>
 <style id="incoming-revenue-v2">.incoming-revenue-panel{min-height:0!important;padding:8px 14px!important;box-sizing:border-box}.incoming-revenue-row{display:flex;align-items:center;gap:12px;min-height:38px}.incoming-revenue-row label{flex:1 1 auto;min-width:0;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.incoming-revenue-input{flex:0 0 160px;width:160px;min-width:0!important}.incoming-revenue-input input{width:100%;min-width:0!important}@media(max-width:620px){.incoming-revenue-panel{padding:7px 9px!important}.incoming-revenue-row{gap:8px}.incoming-revenue-row label{font-size:clamp(11px,2.9vw,13px)}.incoming-revenue-input{flex-basis:105px;width:105px}}</style>
+<style id="manager-refunds-compact">
+.manager-refunds-panel{min-height:0!important;padding:0!important;overflow:hidden;box-sizing:border-box}
+.manager-refunds-panel .adjustment-tabs{display:grid;grid-template-columns:1fr;gap:0;width:100%;margin:0;padding:0;border:0;border-radius:0;background:transparent}
+.manager-refunds-panel .adjustment-tabs button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:38px;padding:8px 14px;border:0;border-radius:0;background:transparent;color:var(--forest);text-align:left;font-size:14px;font-weight:800;box-shadow:none}
+.manager-refunds-panel .adjustment-tabs button span:first-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.manager-refunds-panel .adjustment-tabs button+button{border-top:1px solid var(--line)}
+.manager-refunds-panel .adjustment-tabs button.active,.manager-refunds-panel .adjustment-tabs button:hover{background:#edf5f0;box-shadow:none}
+.manager-refunds-panel .adjustment-chevron{flex:none;color:var(--muted);font-size:15px;transition:transform .2s ease}
+.manager-refunds-panel .adjustment-tabs button[aria-expanded="true"] .adjustment-chevron{transform:rotate(180deg)}
+.manager-refunds-panel .adjustment-view{padding:14px;border-top:1px solid var(--line)}
+@media(max-width:620px){.manager-refunds-panel .adjustment-tabs button{min-height:36px;padding:7px 9px;font-size:clamp(11px,2.9vw,13px)}.manager-refunds-panel .adjustment-view{padding:11px 9px}}
+</style>
 <script id="manager-refunds-runtime">
 (function(){
   "use strict";
@@ -138,9 +149,8 @@
     section.id=panelId;
     section.className="panel full-panel manager-refunds-panel";
     section.innerHTML=
-      '<div class="manager-refunds-head"><div><span class="eyebrow">Корректировка ФОТ</span><h2>Удержания и возвраты</h2><p>Два независимых регистра: возвраты клиентов менеджеров и внутренние удержания сотрудников.</p></div><span class="manager-refunds-badge">Автоматический перерасчёт</span></div>'+
-      '<div class="adjustment-tabs"><button type="button" class="active" data-adjustment-tab="refunds">Возвраты менеджеров</button><button type="button" data-adjustment-tab="deductions">Удержания сотрудников</button></div>'+
-      '<div class="adjustment-view" data-adjustment-view="refunds">'+
+      '<div class="adjustment-tabs" role="group" aria-label="Удержания и возвраты"><button type="button" aria-expanded="false" aria-controls="refund-adjustment-details" data-adjustment-tab="refunds"><span>Возвраты менеджеров</span><span class="adjustment-chevron" aria-hidden="true">▾</span></button><button type="button" aria-expanded="false" aria-controls="deduction-adjustment-details" data-adjustment-tab="deductions"><span>Удержания сотрудников</span><span class="adjustment-chevron" aria-hidden="true">▾</span></button></div>'+
+      '<div id="refund-adjustment-details" class="adjustment-view" data-adjustment-view="refunds" hidden>'+
         '<p class="employee-deduction-note">Возврат попадает в P&amp;L и уменьшает KPI выбранного менеджера на 9,5%.</p>'+
         '<div class="manager-refunds-form">'+
           '<label class="manager-refunds-field"><span>Месяц</span><input id="manager-refund-month" type="month"></label>'+
@@ -154,7 +164,7 @@
         '<p id="manager-refunds-message" class="manager-refunds-message"></p>'+
         '<div id="manager-refunds-list" class="manager-refunds-list"><div class="manager-refunds-empty">Загрузка возвратов…</div></div>'+
       '</div>'+
-      '<div class="adjustment-view" data-adjustment-view="deductions" hidden>'+
+      '<div id="deduction-adjustment-details" class="adjustment-view" data-adjustment-view="deductions" hidden>'+
         '<p class="employee-deduction-note">Удержание доступно для любого сотрудника. Сначала уменьшается KPI, затем оклад; общий ФОТ и расходы P&amp;L пересчитываются автоматически.</p>'+
         '<div class="manager-refunds-form">'+
           '<label class="manager-refunds-field"><span>Месяц</span><input id="employee-deduction-month" type="month"></label>'+
@@ -172,10 +182,16 @@
 
     Array.prototype.forEach.call(section.querySelectorAll("[data-adjustment-tab]"),function(tab){
       tab.addEventListener("click",function(){
+        if(busy)return;
         var key=tab.getAttribute("data-adjustment-tab");
-        Array.prototype.forEach.call(section.querySelectorAll("[data-adjustment-tab]"),function(item){item.classList.toggle("active",item===tab);});
-        Array.prototype.forEach.call(section.querySelectorAll("[data-adjustment-view]"),function(view){view.hidden=view.getAttribute("data-adjustment-view")!==key;});
-        if(key==="deductions")loadEmployeeDeductions();
+        var opening=tab.getAttribute("aria-expanded")!=="true";
+        Array.prototype.forEach.call(section.querySelectorAll("[data-adjustment-tab]"),function(item){item.classList.remove("active");item.setAttribute("aria-expanded","false");});
+        Array.prototype.forEach.call(section.querySelectorAll("[data-adjustment-view]"),function(view){view.hidden=true;});
+        if(!opening)return;
+        tab.classList.add("active");
+        tab.setAttribute("aria-expanded","true");
+        section.querySelector('[data-adjustment-view="'+key+'"]').hidden=false;
+        if(key==="deductions")loadEmployeeDeductions();else loadPanel();
       });
     });
 
@@ -198,7 +214,6 @@
     });
     document.getElementById("employee-deduction-amount").addEventListener("input",updateEmployeeDeductionPreview);
     document.getElementById("employee-deduction-save").addEventListener("click",saveEmployeeDeduction);
-    loadPanel();
   }
   function updatePreview(){
     var amount=Number((document.getElementById("manager-refund-amount")||{}).value||0);
