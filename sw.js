@@ -1,4 +1,4 @@
-const CACHE_NAME = "nsl-finance-mobile-v58";
+const CACHE_NAME = "nsl-finance-mobile-v59";
 const APP_ROOT = "/nsl-finance-center/";
 const APP_SHELL = [APP_ROOT, `${APP_ROOT}index.html`];
 
